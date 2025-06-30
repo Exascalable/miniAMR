@@ -55,7 +55,7 @@ double check_sum(int var)
 
    t2 = timer();
 
-   MPI_Allreduce(&sum, &gsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&sum, &gsum, 1, MPI_DOUBLE, MPI_SUM, MPIX_COMM_NEW_WORLD);
 
    t3 = timer();
    timer_cs_red += t3 - t2;

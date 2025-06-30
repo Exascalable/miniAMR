@@ -79,3 +79,6 @@ EXTERN int *bin, *gbin;
 EXTERN MPI_Comm *comms;
 EXTERN int *me;
 EXTERN int *np;
+
+EXTERN MPI_comm MPIX_COMM_NEW_WORLD; // this is the way to introduce sessions and/or Timelord
+                                     // and any other mechanism that hides processes at startup

@@ -70,14 +70,14 @@ void comm(int start, int num_comm, int stage)
                   size = comm_vars*msg_len[dir][2];
                MPI_Irecv(&recv_buff[comm_recv_off[dir][comm_index[dir][i]+n]],
                          size, MPI_DOUBLE, comm_partner[dir][i], n,
-                         MPI_COMM_WORLD, &request[num_mesg]);
+                         MPIX_COMM_NEW_WORLD, &request[num_mesg]);
                counter_halo_recv[dir]++;
                size_mesg_recv[dir] += (double) size*sizeof(double);
             }
          else {
             MPI_Irecv(&recv_buff[comm_recv_off[dir][comm_index[dir][i]]],
                       recv_size[dir][i], MPI_DOUBLE,
-                      comm_partner[dir][i], type, MPI_COMM_WORLD, &request[i]);
+                      comm_partner[dir][i], type, MPIX_COMM_NEW_WORLD, &request[i]);
             counter_halo_recv[dir]++;
             size_mesg_recv[dir] += (double) recv_size[dir][i]*sizeof(double);
             num_mesg++;
@@ -118,10 +118,10 @@ void comm(int start, int num_comm, int stage)
                   size = comm_vars*msg_len[dir][3];
                if (nonblocking)
                   MPI_Isend(&send_buff[offset], size, MPI_DOUBLE,
-                            comm_partner[dir][i], n, MPI_COMM_WORLD,&s_req[k]);
+                            comm_partner[dir][i], n, MPIX_COMM_NEW_WORLD,&s_req[k]);
                else
                   MPI_Send(send_buff, size, MPI_DOUBLE, comm_partner[dir][i],n,
-                           MPI_COMM_WORLD);
+                           MPIX_COMM_NEW_WORLD);
                counter_halo_send[dir]++;
                size_mesg_send[dir] += (double) size*sizeof(double);
                t4 = timer();
@@ -145,10 +145,10 @@ void comm(int start, int num_comm, int stage)
             if (nonblocking)
                MPI_Isend(&send_buff[comm_send_off[dir][comm_index[dir][i]]],
                          send_size[dir][i], MPI_DOUBLE, comm_partner[dir][i],
-                         type, MPI_COMM_WORLD, &s_req[i]);
+                         type, MPIX_COMM_NEW_WORLD, &s_req[i]);
             else
                MPI_Send(send_buff, send_size[dir][i], MPI_DOUBLE,
-                        comm_partner[dir][i], type, MPI_COMM_WORLD);
+                        comm_partner[dir][i], type, MPIX_COMM_NEW_WORLD);
             counter_halo_send[dir]++;
             size_mesg_send[dir] += (double) send_size[dir][i]*sizeof(double);
             t4 = timer();

@@ -1307,7 +1307,7 @@ void calculate_results(void)
    int i;
 
    MPI_Allreduce(&local_max_b, &global_max_b, 1, MPI_INT, MPI_MAX,
-                 MPI_COMM_WORLD);
+                 MPIX_COMM_NEW_WORLD);
    results[0] = timer_all;
    for (i = 0; i < 9; i++)
       results[i+1] = 0.0;
@@ -1406,15 +1406,15 @@ void calculate_results(void)
    results[140] = total_fp_muls;
    results[141] = total_fp_divs;
 
-   MPI_Allreduce(results, average, 142, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-   MPI_Allreduce(results, minimum, 139, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
-   MPI_Allreduce(results, maximum, 139, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+   MPI_Allreduce(results, average, 142, MPI_DOUBLE, MPI_SUM, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(results, minimum, 139, MPI_DOUBLE, MPI_MIN, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(results, maximum, 139, MPI_DOUBLE, MPI_MAX, MPIX_COMM_NEW_WORLD);
 
    for (i = 0; i < 139; i++) {
       average[i] /= (double) num_pes;
       stddev[i] = (results[i] - average[i])*(results[i] - average[i]);
    }
-   MPI_Allreduce(stddev, stddev_sum, 139, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(stddev, stddev_sum, 139, MPI_DOUBLE, MPI_SUM, MPIX_COMM_NEW_WORLD);
    for (i = 0; i < 139; i++)
       stddev[i] = sqrt(stddev_sum[i]/((double) num_pes));
 }

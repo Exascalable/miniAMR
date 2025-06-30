@@ -44,9 +44,13 @@ int main(int argc, char** argv)
 #include "param.h"
 
    ierr = MPI_Init(&argc, &argv);
-   ierr = MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_ARE_FATAL);
-   ierr = MPI_Comm_rank(MPI_COMM_WORLD, &my_pe);
-   ierr = MPI_Comm_size(MPI_COMM_WORLD, &num_pes);
+#ifndef MPIX_USE_COMM_NEW_WORLD
+   MPIX_COMM_NEW_WORLD = MPI_COMM_WORLD;  // just alias to the actual MPI_COMM_WORLD.
+#endif
+   
+   ierr = MPI_Comm_set_errhandler(MPIX_COMM_NEW_WORLD, MPI_ERRORS_ARE_FATAL);
+   ierr = MPI_Comm_rank(MPIX_COMM_NEW_WORLD, &my_pe);
+   ierr = MPI_Comm_size(MPIX_COMM_NEW_WORLD, &num_pes);
 
    t1 = timer();
    counter_malloc = 0;
@@ -149,7 +153,7 @@ int main(int argc, char** argv)
          } else if (!strcmp(argv[i], "--object")) {
             if (object_num >= num_objects) {
                printf("object number greater than num_objects\n");
-               MPI_Abort(MPI_COMM_WORLD, -1);
+               MPI_Abort(MPIX_COMM_NEW_WORLD, -1);
             }
             objects[object_num].type = atoi(argv[++i]);
             objects[object_num].bounce = atoi(argv[++i]);
@@ -168,16 +172,16 @@ int main(int argc, char** argv)
             object_num++;
          } else if (!strcmp(argv[i], "--help")) {
             print_help_message();
-            MPI_Abort(MPI_COMM_WORLD, -1);
+            MPI_Abort(MPIX_COMM_NEW_WORLD, -1);
          } else {
             printf("** Error ** Unknown input parameter %s\n", argv[i]);
             print_help_message();
-            MPI_Abort(MPI_COMM_WORLD, -1);
+            MPI_Abort(MPIX_COMM_NEW_WORLD, -1);
          }
 
       if (object_num != num_objects) {
          printf("Error - number of objects less than specified");
-         MPI_Abort(MPI_COMM_WORLD, -1);
+         MPI_Abort(MPIX_COMM_NEW_WORLD, -1);
       }
 
       if (reorder == -1) {
@@ -188,7 +192,7 @@ int main(int argc, char** argv)
       }
 
       if (check_input())
-         MPI_Abort(MPI_COMM_WORLD, -1);
+         MPI_Abort(MPIX_COMM_NEW_WORLD, -1);
 
       if (!block_change)
          block_change = num_refine;
@@ -234,9 +238,9 @@ int main(int argc, char** argv)
       params[37] = lb_method;
       params[38] = use_tsteps;
 
-      MPI_Bcast(params, 39, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(params, 39, MPI_INT, 0, MPIX_COMM_NEW_WORLD);
       if (use_time)
-         MPI_Bcast(&end_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+         MPI_Bcast(&end_time, 1, MPI_DOUBLE, 0, MPIX_COMM_NEW_WORLD);
 
       objs = (double *) ma_malloc(14*num_objects*sizeof(double),
                                   __FILE__, __LINE__);
@@ -257,11 +261,11 @@ int main(int argc, char** argv)
          objs[i++] = objects[object_num].inc[2];
       }
 
-      MPI_Bcast(objs, (14*num_objects), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(objs, (14*num_objects), MPI_DOUBLE, 0, MPIX_COMM_NEW_WORLD);
       free(objs);
    } else {
       // Exchange parameters
-      MPI_Bcast(params, 39, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(params, 39, MPI_INT, 0, MPIX_COMM_NEW_WORLD);
       max_num_blocks = params[ 0];
       num_refine = params[ 1];
       uniform_refine = params[ 2];
@@ -303,14 +307,14 @@ int main(int argc, char** argv)
       use_tsteps = params[38];
 
       if (use_time)
-         MPI_Bcast(&end_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+         MPI_Bcast(&end_time, 1, MPI_DOUBLE, 0, MPIX_COMM_NEW_WORLD);
 
       objects = (object *) ma_malloc(num_objects*sizeof(object),
                                      __FILE__, __LINE__);
       objs = (double *) ma_malloc(14*num_objects*sizeof(double),
                                   __FILE__, __LINE__);
 
-      MPI_Bcast(objs, (14*num_objects), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(objs, (14*num_objects), MPI_DOUBLE, 0, MPIX_COMM_NEW_WORLD);
 
       for (i = object_num = 0; object_num < num_objects; object_num++) {
          objects[object_num].type = (int) objs[i++];
@@ -362,7 +366,7 @@ int main(int argc, char** argv)
    // End all MPI instances
    fflush(NULL);
 
-   MPI_Barrier(MPI_COMM_WORLD);
+   MPI_Barrier(MPIX_COMM_NEW_WORLD);
 
    MPI_Finalize();
 

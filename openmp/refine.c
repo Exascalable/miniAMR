@@ -49,7 +49,7 @@ void refine(int ts)
 
    t2 = timer();
    MPI_Allreduce(local_num_blocks, num_blocks, (num_refine+1),
-                 MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
+                 MPI_LONG_LONG_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    timer_refine_sy += timer() - t2;
    t4 += timer() - t2;
 
@@ -95,9 +95,9 @@ void refine(int ts)
 
       t2 = timer();
       sum_b = num_active + 7*num_split + 1;
-      MPI_Allreduce(&sum_b, &max_b, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(&sum_b, &max_b, 1, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
       sum_b = num_parents + num_split;
-      MPI_Allreduce(&sum_b, &min_b, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(&sum_b, &min_b, 1, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
       if (max_b > ((int) (0.9*((double) max_num_blocks))) ||
           min_b > ((int) (0.9* ((double) max_num_parents)))) {
          redistribute_blocks(&tp1, &tm1, &tu1, &t3, &nm_r, num_split);
@@ -134,7 +134,7 @@ void refine(int ts)
 
       t2 = timer();
       MPI_Allreduce(local_num_blocks, num_blocks, (num_refine+1),
-                    MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
+                    MPI_LONG_LONG_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
       timer_refine_sy += timer() - t2;
       t4 += timer() - t2;
       if (lb_opt == 2) {
@@ -142,11 +142,11 @@ void refine(int ts)
          if (num_active > local_max_b)
             local_max_b = num_active;
          MPI_Allreduce(&num_active, &min_b, 1, MPI_INT, MPI_MIN,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          MPI_Allreduce(&num_active, &max_b, 1, MPI_INT, MPI_MAX,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          MPI_Allreduce(&num_active, &sum_b, 1, MPI_INT, MPI_SUM,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          t4 += timer() - t2;
          ratio = ((double) (max_b - min_b)*num_pes)/((double) sum_b);
          if (!uniform_refine && max_b > (min_b + 1) &&
@@ -160,7 +160,7 @@ void refine(int ts)
 
             t2 = timer();
             MPI_Allreduce(local_num_blocks, num_blocks, (num_refine+1),
-                          MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
+                          MPI_LONG_LONG_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
             timer_refine_sy += timer() - t2;
             t4 += timer() - t2;
          }
@@ -176,11 +176,11 @@ void refine(int ts)
    t2 = timer();
    if (num_active > local_max_b)
       local_max_b = num_active;
-   MPI_Allreduce(&num_active, &min_b, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-   MPI_Allreduce(&num_active, &max_b, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-   MPI_Allreduce(&num_active, &sum_b, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&num_active, &min_b, 1, MPI_INT, MPI_MIN, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(&num_active, &max_b, 1, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(&num_active, &sum_b, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    i = nm_r + nm_c;
-   MPI_Allreduce(&i, &num_split, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&i, &num_split, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    for (j = 0; j <= num_refine; j++) {
       if (!j)
          global_active = num_blocks[0];
@@ -210,17 +210,17 @@ void refine(int ts)
          t4 += t5 - t2;
 
          MPI_Allreduce(&num_active, &min_b, 1, MPI_INT, MPI_MIN,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          MPI_Allreduce(&num_active, &max_b, 1, MPI_INT, MPI_MAX,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          MPI_Allreduce(&num_active, &sum_b, 1, MPI_INT, MPI_SUM,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
          if (!my_pe && report_perf & 8) printf("after ave %d min %d max %d\n",
                                                sum_b/num_pes, min_b, max_b);
 
          t2 = timer();
          MPI_Allreduce(local_num_blocks, num_blocks, (num_refine+1),
-                       MPI_LONG_LONG_INT, MPI_SUM, MPI_COMM_WORLD);
+                       MPI_LONG_LONG_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
          timer_refine_sy += timer() - t2;
          t4 += timer() - t2;
       }
@@ -242,12 +242,12 @@ void refine(int ts)
    }
    nc[0] = group;
    nc[1] = (group > 1) ? 1 : 0;
-   MPI_Allreduce(nc, nca, 2, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(nc, nca, 2, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    groups = nca[0];
    if (groups > num_pes) {
       num_over++;
       tot_over += i = groups - num_pes;
-      MPI_Allreduce(&group, &groups, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(&group, &groups, 1, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
       if (groups > max_groups)
          max_groups = groups;
       if (!my_pe && report_perf & 8)
@@ -299,9 +299,9 @@ void refine(int ts)
       num_comm_u_max = nc_u;
    if (nc_u < num_comm_u_min)
       num_comm_u_min = nc_u;
-   MPI_Allreduce(nc, ncn, 5, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-   MPI_Allreduce(nc, ncx, 5, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-   MPI_Allreduce(nc, nca, 5, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(nc, ncn, 5, MPI_INT, MPI_MIN, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(nc, ncx, 5, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
+   MPI_Allreduce(nc, nca, 5, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    if (!my_pe && report_perf & 8) {
       printf("comm partners x ave %6.2lf min %d max %d\n",
              ((double) nca[0]/(double) num_pes), ncn[0], ncx[0]);
@@ -421,7 +421,7 @@ int refine_level(void)
          }
 
          MPI_Allreduce(&lchange, &change, 1, MPI_INT, MPI_SUM,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
 
          // Communicate these changes if any made
          if (change) {
@@ -477,7 +477,7 @@ int refine_level(void)
          }
 
          MPI_Allreduce(&lchange, &change, 1, MPI_INT, MPI_SUM,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
 
          // Communicate these changes of any parent that can not refine
          if (change) {
@@ -564,7 +564,7 @@ void redistribute_blocks(double *tp, double *tm, double *tu, double *time,
       bin[i] = 0;
    bin[my_pe] = num_split;
 
-   MPI_Allreduce(bin, gbin, num_pes, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(bin, gbin, num_pes, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
 
    for (sum = i = 0; i < num_pes; i++) {
       from[i] = 0;
@@ -578,7 +578,7 @@ void redistribute_blocks(double *tp, double *tm, double *tu, double *time,
    if (bin[my_pe] < 0)
       bin[my_pe] = 0;
 
-   MPI_Allreduce(bin, space, num_pes, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(bin, space, num_pes, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
 
    for (in = 0; in < sorted_index[num_refine+1]; in++)
       blocks[sorted_list[in].n].new_proc = -1;
@@ -650,10 +650,10 @@ void redistribute_blocks(double *tp, double *tm, double *tu, double *time,
                blocks[pp->child[i]].new_proc = my_pe;
       }
 
-   MPI_Allreduce(&m, &n, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&m, &n, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
 
    if (n) {
-      MPI_Allreduce(&my_active, &sum, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(&my_active, &sum, 1, MPI_INT, MPI_MAX, MPIX_COMM_NEW_WORLD);
 
       if (sum > ((int) (0.9*((double) max_num_blocks)))) {
          // even up the expected number of blocks per processor
@@ -662,7 +662,7 @@ void redistribute_blocks(double *tp, double *tm, double *tu, double *time,
          bin[my_pe] = my_active;
 
          MPI_Allreduce(bin, gbin, num_pes, MPI_INT, MPI_SUM,
-                       MPI_COMM_WORLD);
+                       MPIX_COMM_NEW_WORLD);
 
          for (sum = i = 0; i < num_pes; i++)
             sum += gbin[i];
@@ -705,7 +705,7 @@ void redistribute_blocks(double *tp, double *tm, double *tu, double *time,
 
       *time = timer() - t1;
 
-      MPI_Alltoall(from, 1, MPI_INT, to, 1, MPI_INT, MPI_COMM_WORLD);
+      MPI_Alltoall(from, 1, MPI_INT, to, 1, MPI_INT, MPIX_COMM_NEW_WORLD);
       move_blocks(tp, tm, tu);
    } else
       *time = timer() - t1;

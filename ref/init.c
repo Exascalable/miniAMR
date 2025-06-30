@@ -149,7 +149,7 @@ void init(void)
    me = (int *) ma_malloc((nfac+1)*sizeof(int), __FILE__, __LINE__);
    np = (int *) ma_malloc((nfac+1)*sizeof(int), __FILE__, __LINE__);
    dirs = (int *) ma_malloc(nfac*sizeof(int), __FILE__, __LINE__);
-   comms[0] = MPI_COMM_WORLD;
+   comms[0] = MPIX_COMM_NEW_WORLD;
    me[0] = my_pe;
    np[0] = num_pes;
    // Initialize for all load balance methods

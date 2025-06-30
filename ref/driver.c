@@ -147,11 +147,11 @@ void driver(void)
          for (i = 0; i < k; i++) {
             ctime[i][4] = ctime[i][0] + ctime[i][1];
             MPI_Allreduce(ctime[i], tmp_time, 5, MPI_DOUBLE, MPI_MAX,
-                          MPI_COMM_WORLD);
+                          MPIX_COMM_NEW_WORLD);
             for (j = 0; j < 5; j++)
                tmax[j] += tmp_time[j];
             MPI_Allreduce(ctime[i], tmp_time, 5, MPI_DOUBLE, MPI_MIN,
-                          MPI_COMM_WORLD);
+                          MPIX_COMM_NEW_WORLD);
             for (j = 0; j < 5; j++)
                tmin[j] += tmp_time[j];
          }

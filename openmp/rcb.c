@@ -153,11 +153,11 @@ void rcb(void)
          n_m_tmp++;
       }
 
-   MPI_Allreduce(&n_m_tmp, &n_m_tot, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&n_m_tmp, &n_m_tot, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    t4 = timer();
    t2 = t4 - t1;
    if (n_m_tot) {  // Only move dots and blocks if there is something to move
-      MPI_Alltoall(to, 1, MPI_INT, from, 1, MPI_INT, MPI_COMM_WORLD);
+      MPI_Alltoall(to, 1, MPI_INT, from, 1, MPI_INT, MPIX_COMM_NEW_WORLD);
 
       move_dots_back();
 
@@ -176,8 +176,8 @@ void rcb(void)
                }
             }
          }
-         MPI_Alltoall(from, 1, MPI_INT, to, 1, MPI_INT, MPI_COMM_WORLD);
-         MPI_Allreduce(&n_m_tmp, &n, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Alltoall(from, 1, MPI_INT, to, 1, MPI_INT, MPIX_COMM_NEW_WORLD);
+         MPI_Allreduce(&n_m_tmp, &n, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
          if (!my_pe && report_perf & 8)
             printf("Move %d blocks out of %d possible to load balance\n",
                    n, n_m_tot);
@@ -235,15 +235,15 @@ void exchange(double *tp, double *tm, double *tu)
             if (f < to[start[l]]) {
                if (num_active < max_num_blocks) {
                   MPI_Irecv(recv_buff, block_size, MPI_DOUBLE, start[l], type,
-                            MPI_COMM_WORLD, request);
+                            MPIX_COMM_NEW_WORLD, request);
                   rb = 1;
                } else
                   rb = 0;
-               MPI_Send(&rb, 1, MPI_INT, start[l], type1, MPI_COMM_WORLD);
+               MPI_Send(&rb, 1, MPI_INT, start[l], type1, MPIX_COMM_NEW_WORLD);
             }
             if (s < from[start[l]]) {
                MPI_Recv(&i, 1, MPI_INT, start[l], type1,
-                        MPI_COMM_WORLD, &status);
+                        MPIX_COMM_NEW_WORLD, &status);
                if (i) {
                   while (sp < max_active_block && 
                          (blocks[sp].number < 0 ||
@@ -259,7 +259,7 @@ void exchange(double *tp, double *tm, double *tu)
                   del_sorted_list(blocks[sp].number, blocks[sp].level, 3);
                   blocks[sp].number = -1;
                   MPI_Send(send_buff, block_size, MPI_DOUBLE, start[l], type,
-                           MPI_COMM_WORLD);
+                           MPIX_COMM_NEW_WORLD);
                   if (fp > sp)
                      fp = sp;
                   sp++;
@@ -709,7 +709,7 @@ void move_dots_back(void)
       if (from[i] > 0) {
          gbin[i+1] = gbin[i] + 2*from[i];
          MPI_Irecv(&recv_int[gbin[i]], 2*from[i], MPI_INT, i, 50,
-                   MPI_COMM_WORLD, &request[i]);
+                   MPIX_COMM_NEW_WORLD, &request[i]);
          nr++;
       } else {
          gbin[i+1] = gbin[i];
@@ -723,7 +723,7 @@ void move_dots_back(void)
                send_int[j++] = dots[d].n;
                send_int[j++] = my_pe;
             }
-         MPI_Send(send_int, 2*to[i], MPI_INT, i, 50, MPI_COMM_WORLD);
+         MPI_Send(send_int, 2*to[i], MPI_INT, i, 50, MPIX_COMM_NEW_WORLD);
       }
 
    for (i = 0; i < nr; i++) {
@@ -835,7 +835,7 @@ void move_blocks(double *tp, double *tm, double *tu)
       k = n;
       for (n1 = i = 0; i < num_pes; i++)
          n1 += from[i];
-      MPI_Allreduce(&n1, &n, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(&n1, &n, 1, MPI_INT, MPI_SUM, MPIX_COMM_NEW_WORLD);
    } while (n && k != n);
 
    if (n && !my_pe) {
