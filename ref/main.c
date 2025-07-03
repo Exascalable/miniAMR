@@ -35,6 +35,20 @@
 #include "timer.h"
 #include "proto.h"
 
+#if 0
+MPI_Comm __MPIX_COMM_NEW_WORLD; // global
+
+void MPIX_Get_comm_new_world(MPI_Comm *out)
+{
+  *out = __MPIX_COMM_NEW_WORLD;
+}  
+#endif
+
+void __attribute__((weak)) MPIX_Get_comm_new_world(MPI_Comm *out)
+{
+   *out = MPI_COMM_WORLD;
+}
+
 int main(int argc, char** argv)
 {
    int i, ierr, object_num;
@@ -46,6 +60,8 @@ int main(int argc, char** argv)
 #ifndef MPIX_USE_COMM_NEW_WORLD
 #warning "MPIX_USE_COMM_NEW_WORLD is literally MPI_COMM_WORLD (feature disabled)"
    MPIX_COMM_NEW_WORLD = MPI_COMM_WORLD;  // just alias to the actual MPI_COMM_WORLD.
+#else
+   MPIX_Get_comm_new_world(&MPIX_COMM_NEW_WORLD);
 #endif
    
    ierr = MPI_Comm_set_errhandler(MPIX_COMM_NEW_WORLD, MPI_ERRORS_ARE_FATAL);
