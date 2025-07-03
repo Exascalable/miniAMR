@@ -44,6 +44,7 @@ int main(int argc, char** argv)
 
    ierr = MPI_Init(&argc, &argv);
 #ifndef MPIX_USE_COMM_NEW_WORLD
+#warning "MPIX_USE_COMM_NEW_WORLD is literally MPI_COMM_WORLD (feature disabled)"
    MPIX_COMM_NEW_WORLD = MPI_COMM_WORLD;  // just alias to the actual MPI_COMM_WORLD.
 #endif
    
