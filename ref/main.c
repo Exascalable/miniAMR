@@ -53,6 +53,8 @@ void __attribute__((weak)) MPIX_Get_comm_new_world(MPI_Comm *out)
 	 
 }
 #endif
+// just the declaration of the function, please:
+void MPIX_Get_comm_new_world(MPI_Comm *out);
 
 int main(int argc, char** argv)
 {
