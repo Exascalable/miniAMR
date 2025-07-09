@@ -35,6 +35,9 @@
 #include "timer.h"
 #include "proto.h"
 
+// just the declaration of the function, please:
+void MPIX_Get_comm_new_world(MPI_Comm *out);
+
 int main(int argc, char** argv)
 {
    int i, ierr, object_num;
@@ -47,8 +50,16 @@ int main(int argc, char** argv)
 #ifndef MPIX_USE_COMM_NEW_WORLD
 #warning "MPIX_USE_COMM_NEW_WORLD is literally MPI_COMM_WORLD (feature disabled)"
    MPIX_COMM_NEW_WORLD = MPI_COMM_WORLD;  // just alias to the actual MPI_COMM_WORLD.
+#else
+   MPIX_Get_comm_new_world(&MPIX_COMM_NEW_WORLD);
+   {
+     int the_size, the_rank;
+     MPI_Comm_size(MPIX_COMM_NEW_WORLD, &the_size);
+     MPI_Comm_rank(MPIX_COMM_NEW_WORLD, &the_rank);
+     printf("MPIX_COMM_NEW_WORLD size is %d, rank = %d\n", the_size, the_rank);
+   }
 #endif
-   
+  
    ierr = MPI_Comm_set_errhandler(MPIX_COMM_NEW_WORLD, MPI_ERRORS_ARE_FATAL);
    ierr = MPI_Comm_rank(MPIX_COMM_NEW_WORLD, &my_pe);
    ierr = MPI_Comm_size(MPIX_COMM_NEW_WORLD, &num_pes);
