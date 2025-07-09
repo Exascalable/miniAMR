@@ -41,12 +41,15 @@ MPI_Comm __MPIX_COMM_NEW_WORLD; // global
 void MPIX_Get_comm_new_world(MPI_Comm *out)
 {
   *out = __MPIX_COMM_NEW_WORLD;
+  printf("I am the unoverloaded function #1: %p\n", __MPIX_COMM_NEW_WORLD);
 }  
 #endif
 
 void __attribute__((weak)) MPIX_Get_comm_new_world(MPI_Comm *out)
 {
    *out = MPI_COMM_WORLD;
+   printf("I am the unoverloaded function #2: %p [regular comm world value]\n", MPI_COMM_NEW_WORLD);
+	 
 }
 
 int main(int argc, char** argv)
